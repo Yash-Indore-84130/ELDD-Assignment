@@ -1,0 +1,1 @@
+cmd_/home/yash/Daliy_practice/ELDD-Assignment/question2/q2.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/yash/Daliy_practice/ELDD-Assignment/question2/q2.ko /home/yash/Daliy_practice/ELDD-Assignment/question2/q2.o /home/yash/Daliy_practice/ELDD-Assignment/question2/q2.mod.o;  true

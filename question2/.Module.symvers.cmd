@@ -1,0 +1,1 @@
+cmd_/home/yash/Daliy_practice/ELDD-Assignment/question2/Module.symvers :=  sed 's/ko$$/o/'  /home/yash/Daliy_practice/ELDD-Assignment/question2/modules.order | scripts/mod/modpost -m -a    -o /home/yash/Daliy_practice/ELDD-Assignment/question2/Module.symvers -e -i Module.symvers -T - 
