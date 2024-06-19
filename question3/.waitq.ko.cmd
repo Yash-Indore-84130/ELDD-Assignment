@@ -1,0 +1,1 @@
+cmd_/home/yash/Daliy_practice/ELDD-Assignment/question3/waitq.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/yash/Daliy_practice/ELDD-Assignment/question3/waitq.ko /home/yash/Daliy_practice/ELDD-Assignment/question3/waitq.o /home/yash/Daliy_practice/ELDD-Assignment/question3/waitq.mod.o;  true
