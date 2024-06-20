@@ -4,7 +4,6 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/kfifo.h>
-#include <linux/wait.h>
 
 static int pchar_open(struct inode *, struct file *);
 static int pchar_close(struct inode *, struct file *);
@@ -12,14 +11,12 @@ static ssize_t pchar_read(struct file *, char *, size_t, loff_t *);
 static ssize_t pchar_write(struct file *, const char *, size_t, loff_t *);
 
 #define MAX 32
+struct semaphore s;
 static struct kfifo buf;
 static int major;
 static dev_t devno;
 static struct class *pclass;
 static struct cdev cdev;
-static wait_queue_head_t wr_wq;
-static wait_queue_head_t rd_wq;
-
 static struct file_operations pchar_fops = {
     .owner = THIS_MODULE,
     .open = pchar_open,
@@ -74,11 +71,7 @@ static __init int pchar_init(void) {
     }
     printk(KERN_INFO "%s: cdev_add() added device in kernel db.\n", THIS_MODULE->name);
 
-    init_waitqueue_head(&wr_wq);
-    printk(KERN_INFO "%s: init_waitqueue_head() writer wait queue.\n", THIS_MODULE->name);
-
-	init_waitqueue_head(&rd_wq);
-	printk(KERN_INFO "%s: init_waitqueue_head() reader  wait queue.\n", THIS_MODULE->name);
+	sema_init(&s, 1);
 
     return 0;
 cdev_add_failed:
@@ -110,55 +103,37 @@ static __exit void pchar_exit(void) {
 
 static int pchar_open(struct inode *pinode, struct file *pfile) {
     printk(KERN_INFO "%s: pchar_open() called.\n", THIS_MODULE->name);
+	down_interruptible(&s);
     return 0;
 }
 
 static int pchar_close(struct inode *pinode, struct file *pfile) {
     printk(KERN_INFO "%s: pchar_close() called.\n", THIS_MODULE->name);
-    return 0;
+    up(&s);
+	return 0;
 }
 
 static ssize_t pchar_read(struct file *pfile, char *ubuf, size_t size, loff_t *poffset) {
     int nbytes, ret;
     printk(KERN_INFO "%s: pchar_read() called.\n", THIS_MODULE->name);
-	ret = wait_event_interruptible(rd_wq, !kfifo_is_empty(&buf));
-	if(ret != 0){
-	
-        printk(KERN_INFO "%s: pchar_read() wake-up due to signal.\n", THIS_MODULE->name);
-        return -ERESTARTSYS;
-
-	}
     ret = kfifo_to_user(&buf, ubuf, size, &nbytes);
     if(ret < 0) {
         printk(KERN_ERR "%s: pchar_read() failed to copy data from kernel space using kfifo_to_user().\n", THIS_MODULE->name);
         return ret;     
     }
     printk(KERN_INFO "%s: pchar_read() copied %d bytes to user space.\n", THIS_MODULE->name, nbytes);
-    if(nbytes > 0)
-        wake_up_interruptible(&wr_wq);
     return nbytes;
 }
 
 static ssize_t pchar_write(struct file *pfile, const char *ubuf, size_t size, loff_t *poffset) {
     int nbytes, ret;
     printk(KERN_INFO "%s: pchar_write() called.\n", THIS_MODULE->name);
-    // makes current process sleep until condition gets true
-	
-    //wait_event(wr_wq, !kfifo_is_full(&buf)); // dormant sleep
-    ret = wait_event_interruptible(wr_wq, !kfifo_is_full(&buf)); // interruptible sleep
-    if(ret != 0) {
-        printk(KERN_INFO "%s: pchar_write() wake-up due to signal.\n", THIS_MODULE->name);
-        return -ERESTARTSYS;
-    }
-
     ret = kfifo_from_user(&buf, ubuf, size, &nbytes);
     if(ret < 0) {
         printk(KERN_ERR "%s: pchar_write() failed to copy data in kernel space using kfifo_from_user().\n", THIS_MODULE->name);
         return ret;     
     }
     printk(KERN_INFO "%s: pchar_write() copied %d bytes from user space.\n", THIS_MODULE->name, nbytes);
-	if(nbytes > 0)
-		wake_up_interruptible(&rd_wq);
     return nbytes;
 }
 

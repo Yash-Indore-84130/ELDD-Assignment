@@ -1,0 +1,1 @@
+cmd_/home/yash/Daliy_practice/ELDD-Assignment/question4/que1.1.mod := printf '%s\n'   que1.1.o | awk '!x[$$0]++ { print("/home/yash/Daliy_practice/ELDD-Assignment/question4/"$$0) }' > /home/yash/Daliy_practice/ELDD-Assignment/question4/que1.1.mod

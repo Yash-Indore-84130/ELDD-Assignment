@@ -31,14 +31,10 @@ static const struct modversion_info ____versions[]
 __used __section("__versions") = {
 	{ 0xbdfb6dbb, "__fentry__" },
 	{ 0x92997ed8, "_printk" },
+	{ 0xcf2a6966, "up" },
 	{ 0x5b8239ca, "__x86_return_thunk" },
-	{ 0xe2c17b5d, "__SCT__might_resched" },
-	{ 0xfe487975, "init_wait_entry" },
-	{ 0x8c26d495, "prepare_to_wait_event" },
-	{ 0x1000e51, "schedule" },
-	{ 0x92540fbf, "finish_wait" },
+	{ 0x6bd0e573, "down_interruptible" },
 	{ 0x30a80826, "__kfifo_from_user" },
-	{ 0x3eeb2322, "__wake_up" },
 	{ 0xd0da656b, "__stack_chk_fail" },
 	{ 0x4578f528, "__kfifo_to_user" },
 	{ 0x139f2189, "__kfifo_alloc" },
@@ -48,7 +44,6 @@ __used __section("__versions") = {
 	{ 0x5943b701, "cdev_init" },
 	{ 0xe1173f12, "cdev_add" },
 	{ 0x6f915e6e, "device_destroy" },
-	{ 0xd9a5ea54, "__init_waitqueue_head" },
 	{ 0xbff14d94, "class_destroy" },
 	{ 0x6091b333, "unregister_chrdev_region" },
 	{ 0xdb760f52, "__kfifo_free" },
@@ -59,4 +54,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "6E163C6F78A01B705D936AF");
+MODULE_INFO(srcversion, "6BE6C423F02865B1FB925F4");
